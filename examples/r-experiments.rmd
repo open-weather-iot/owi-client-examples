@@ -1,0 +1,42 @@
+# Exemplo de utilização da API REST *open weather iot* em R no RStudio
+
+Primeiramente, instalamos os pacotes necessários: `httr`, `jsonlite` e `readr`.:
+```{r}
+#install.packages("httr")
+#install.packages("jsonlite")
+#install.packages("readr")
+```
+
+Importamos as bibliotecas necessárias: `httr` e `jsonlite`:
+```{r}
+library(httr)
+library(jsonlite)
+```
+
+Agora, fazemos uma requisição *web* para o *endpoint* `/dataseries` no servidor `owi-server.onrender.com`, obtendo uma resposta em JSON da série de dados meteorológicos brutos:
+```{r}
+weather_data_series_json_raw <- httr::GET(url = "https://owi-server.onrender.com/dataseries")
+```
+
+Convertemos a resposta em JSON `weather_data_series_json_raw` para um dataframe em R e exibimos a coluna `raw`:
+```{r}
+weather_data_series_json = data.frame(
+    jsonlite::fromJSON(
+        httr::content(weather_data_series_json_raw, "text", encoding = "UTF-8"),
+    ),
+    row.names = NULL
+)
+#weather_data_series_json
+weather_data_series_json$raw
+```
+
+Por motivos de compatibilidade, a API REST também é capaz de retornar resultados compatíveis com o formato utilizado pelos sistemas anteriores:
+```{r}
+weather_data_series_csv_raw <- httr::GET(url = "https://owi-server.onrender.com/dataseries/old-format")
+weather_data_series_csv_raw
+```
+
+```{r}
+weather_data_series_csv = read.csv(text=httr::content(weather_data_series_csv_raw, "text", encoding = "UTF-8"))
+weather_data_series_csv
+```
