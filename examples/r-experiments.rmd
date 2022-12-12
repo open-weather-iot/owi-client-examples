@@ -1,3 +1,8 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Exemplo de utilização da API REST *open weather iot* em R no RStudio
 
 Primeiramente, instalamos os pacotes necessários: `httr`, `jsonlite` e `readr`.:
@@ -18,7 +23,7 @@ Agora, fazemos uma requisição *web* para o *endpoint* `/dataseries` no servido
 weather_data_series_json_raw <- httr::GET(url = "https://owi-server.onrender.com/dataseries")
 ```
 
-Convertemos a resposta em JSON `weather_data_series_json_raw` para um dataframe em R e exibimos a coluna `raw`:
+Convertemos a resposta em JSON `weather_data_series_json_raw` para um dataframe em R e o exibimos:
 ```{r}
 weather_data_series_json = data.frame(
     jsonlite::fromJSON(
@@ -26,8 +31,22 @@ weather_data_series_json = data.frame(
     ),
     row.names = NULL
 )
-#weather_data_series_json
-weather_data_series_json$raw
+print(weather_data_series_json)
+```
+
+Observamos a coluna `raw` possui os dados de medições. Os sensores disponíveis nessa coluna são os seguintes:
+```{r}
+colnames(weather_data_series_json$raw)
+```
+
+Vamos selecionar apenas as colunas que contém o valor e unidade de medida da temperatura da CPU do sistema:
+```{r}
+print(weather_data_series_json$raw$'SYS/cpu/temperature'[c('value', 'unit')])
+```
+
+A média da temperatura da CPU do sistema é:
+```{r}
+mean(weather_data_series_json$raw$'SYS/cpu/temperature'$value)
 ```
 
 Por motivos de compatibilidade, a API REST também é capaz de retornar resultados compatíveis com o formato utilizado pelos sistemas anteriores:
