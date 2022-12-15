@@ -36,26 +36,15 @@ print(weather_data_series_json)
 
 Observamos a coluna `raw` possui os dados de medições. Os sensores disponíveis nessa coluna são os seguintes:
 ```{r}
-colnames(weather_data_series_json$raw)
+colnames(weather_data_series_json$measurements)
 ```
 
 Vamos selecionar apenas as colunas que contém o valor e unidade de medida da temperatura da CPU do sistema:
 ```{r}
-print(weather_data_series_json$raw$'SYS/cpu/temperature'[c('value', 'unit')])
+print(weather_data_series_json$measurements$'SYS/cpu/temperature'[c('value', 'unit')])
 ```
 
-A média da temperatura da CPU do sistema é:
+A média da temperatura do PT100 é:
 ```{r}
-mean(weather_data_series_json$raw$'SYS/cpu/temperature'$value)
-```
-
-Por motivos de compatibilidade, a API REST também é capaz de retornar resultados compatíveis com o formato utilizado pelos sistemas anteriores:
-```{r}
-weather_data_series_csv_raw <- httr::GET(url = "https://owi-server.onrender.com/dataseries/old-format")
-weather_data_series_csv_raw
-```
-
-```{r}
-weather_data_series_csv = read.csv(text=httr::content(weather_data_series_csv_raw, "text", encoding = "UTF-8"))
-weather_data_series_csv
+mean(weather_data_series_json$measurements$'PT100/temperature'$value)
 ```
